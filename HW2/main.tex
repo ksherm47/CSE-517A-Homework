@@ -148,11 +148,13 @@ Therefore, $\mathbf{w} = \langle w_i \rangle_{i=0}^{d}$ such that
 
 \end{enumerate}
 
-% \section{Comparing two classifiers with cross-validation}
-% \begin{enumerate}[label=(\alph*)]
+\section{Comparing two classifiers with cross-validation}
+\begin{enumerate}[label=(\alph*)]
 
-% \item
+\item We can select tests that analyze significant differences between two groups. One option would be a Student's T-test (or a non-parametric equivalent such as a Wilcoxon Test), which is appropriate since can't apply a Z-test since we don't know whether the accuracy distributions in both groups are normally distributed. Alternatively, we can choose a non-parametric test such as a Chi-squared test of independence, to test whether the accuracy of each fold is independent to the model class.
+\item The null hypothesis $H_0$ for a Student's T-test $Accuracy_A = Accuracy_B$ to test the hypothesis that there is a significant difference between the distribution of accuracies in Model A and Model B. In a Chi-squared test of independence, the null hypothesis is that there is no significant relationship between the accuracies of each fold between the two models.
+\item We could choose a significance threshold of 0.05 for both models. In the Student's T-test, the statistic we're evaluating is the T Score, which has the equation $t = \frac{X - \mu}{\frac{s}{\sqrt{n}}}$. Using the T score, we can calculate the p-value through the T-distribution. In the Chi-squared test of independence, the test statistic is $X^2 = \sum \frac{(O_i-E_i)^2}{E_i}$ which we can use to calculate the p-value using a Chi-squared distribution.
 
-% \end{enumerate}
+\end{enumerate}
 
 \end{document}
