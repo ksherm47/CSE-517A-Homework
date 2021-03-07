@@ -1,0 +1,158 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{CSE 517A Homework 2}
+\author{Kenneth Sherman, Nitan Shalon}
+\date{February 2021}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{enumitem}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1.0in]{geometry}
+
+\begin{document}
+
+\maketitle
+
+\section{Logistic Regression revisited}
+\begin{enumerate}[label=(\alph*)]
+\item By definition, Eq. (2) can be written as
+
+\begin{center}$p(y\:|\:\mathbf{x}, \mathbf{w}) = 
+sigm(\mathbf{w}^\intercal \mathbf{x})^y
+(1 - sigm(\mathbf{w}^\intercal \mathbf{x}))^{1-y}$\end{center}
+
+\begin{center}$= sigm(\mathbf{w}^\intercal \mathbf{x})^y
+sigm(-\mathbf{w}^\intercal \mathbf{x})^{1-y}$\end{center}
+
+When $y = 1$, we see that the right-hand side of Eq. (2) simplifies to 
+\begin{center}$sigm(\mathbf{w}^\intercal \mathbf{x}) = \frac{1}{1 + \exp(-\mathbf{w}^\intercal \mathbf{x})}$, \end{center} 
+which is equivalent to Eq. (1) when $y = 1$ (positive classification). When $y = 0$, the right-hand side of Eq. (2) simplifies to 
+\begin{center}$sigm(-\mathbf{w}^\intercal \mathbf{x}) = \frac{1}{1 + \exp(\mathbf{w}^\intercal \mathbf{x})}$, \end{center}
+which is equivalent to Eq. (1) when $y=-1$ (negative classification).\\
+
+\item $\prod_{i = 1}^{n}p(y_i\:|\:\mathbf{x}_i,\mathbf{w})p(\mathbf{w})
+= \prod_{i = 1}^{n}
+\dfrac
+{\exp(-\frac{\mathbf{w}^\intercal \mathbf{w}}{2\sigma^2})}
+{(1 + \exp(-y_i\mathbf{w}^\intercal \mathbf{x}_i))(\sqrt{2\pi\sigma^2})}$ \\\\
+
+
+$\implies -\log(\prod_{i = 1}^{n}p(y_i\:|\:\mathbf{x}_i,\mathbf{w})p(\mathbf{w})) = 
+\sum_{i=1}^{n}( \frac{\mathbf{w}^\intercal\mathbf{w}}{2\sigma^2}
++ \log(1 + \exp(-y_i\mathbf{w}^\intercal \mathbf{x}_i))
++ \frac{1}{2}\log(2\pi\sigma^2))$ \\
+
+\begin{center}$= \sum_{i=1}^{n}\log(1 + \exp(-y_i\mathbf{w}^\intercal \mathbf{x}_i))
++ \frac{n}{2\sigma^2}||\mathbf{w}||_2^2
++ \frac{n}{2}\log(2\pi\sigma^2)$ \end{center}\leavevmode
+
+\item The equivalent SRM formulation is the logistic loss function with L2 regularization, and in this case $\lambda =
+\frac{n}{2\sigma^2}$.\\
+
+\item \leavevmode
+\begin{center}$\log\frac{p(y\:=\:1\:|\:\mathbf{x}, \mathbf{w})}{p(y\:=\:-1\:|\:\mathbf{x}, \mathbf{w})} = \log\dfrac{\frac{1}{1 + \exp(-\mathbf{w}^\intercal \mathbf{x})}}{\frac{1}{1 + \exp(\mathbf{w}^\intercal \mathbf{x})}}$ \end{center}
+
+\begin{center} $= \log\frac{1 + \exp(\mathbf{w}^\intercal \mathbf{x})}{1 + \exp(-\mathbf{w}^\intercal \mathbf{x})}$ \end{center}
+\begin{center} $= \log\frac{\exp(\mathbf{w}^\intercal \mathbf{x})(1 + \exp(-\mathbf{w}^\intercal \mathbf{x}))}{1 + \exp(-\mathbf{w}^\intercal \mathbf{x})}$ \end{center}
+\begin{center} $= \log(\exp(\mathbf{w}^\intercal \mathbf{x})) = \mathbf{w}^\intercal \mathbf{x}$ \end{center}
+
+This tells us that a feature change that causes $\mathbf{w}^\intercal \mathbf{x}$ to increase also causes the odds of a positive label prediction to increase, and a feature change that causes $\mathbf{w}^\intercal \mathbf{x}$ to decrease causes the odds of a negative label prediction to increase. 
+
+\end{enumerate}
+
+\section{Na\"{i}ve Bayes}
+\begin{enumerate}[label=(\alph*)]
+
+\item In general, the number of parameters to estimate given $X_i$ and $Y$ are binary is $2^{d+1} + 2.$ This is the sum of the number of values for $p(X_1 = x_1,\:...\:,X_d = x_d\:|\:Y = y)$ and the number of values for $p(Y = y)$, respectively. Given that $d=2$, the number of parameters to estimate is $2^{2+1} + 2 = 10$. 
+
+\item The number of parameters to estimate given $d = 100$ is 
+\begin{center}$2^{100+1} + 2 = 2,535,301,200,456,458,802,993,406,410,754$.\end{center}
+
+\item Using the Na\"{i}ve Bayes assumption makes it so only $2d\:( << 2^{d+1})$  parameters need to be estimated for $p(X_1 = x_1,\:...\:,X_d = x_d\:|\:Y = y)$. So in the example above, only $2(2) + 2 = 6$ parameters need to be estimated when $d = 2$ and only $2(100) + 2 = 202$ parameters need to be estimated when $d = 100$.
+
+\end{enumerate}
+
+\section{Na\"{i}ve Bayes, part II}
+\begin{enumerate}[label=(\alph*)]
+
+\item Deriving the log-likelihood for maximization of $p(Y = c)\prod_{l = 1}^{n}p(W = w_l\:|\:Y = c)$ yields 
+\begin{center}$\log(p(Y = c)\prod_{l = 1}^{m}p(W = w_l\:|\:Y = c)) = \log{p(Y = c)} + \sum_{l = 1}^{m}\log{p(W = w_l\:|\:Y = c)}$\end{center}
+Positive classification of the document $(Y = +1)$ implies that
+\begin{center}$\log{p(Y = +1)} + \sum_{l = 1}^{m}\log{p(W = w_l\:|\:Y = +1)} > \log{p(Y = -1)} + \sum_{l = 1}^{m}\log{p(W = w_l\:|\:Y = -1)}$ \end{center}
+\begin{center}$\implies \log{\dfrac{p(Y = +1)}{p(Y = -1)}} + \sum_{l = 1}^{m}\log{\dfrac{p(W = w_l\:|\:Y = +1)}{p(W = w_l\:|\:Y = -1)}} > 0$ \end{center}
+If we define $\mathbf{v}$ and $b$ as the following:
+\begin{center}$\mathbf{v} := \left\langle\log{\dfrac{p(W = \alpha_1\:|\:Y = +1)}{p(W = \alpha_1\:|\:Y = -1)}},\:...\:,
+\log{\dfrac{p(W = \alpha_d\:|\:Y = +1)}{p(W = \alpha_d\:|\:Y = -1)}}\right\rangle \in \mathds{R}^d$ \end{center}
+\begin{center}$b := \log{\dfrac{p(Y = +1)}{p(Y = -1)}}$,\end{center}
+then we have formulated Na\"{i}ve Bayes as a linear classifier of the form $sign(\mathbf{v}^\intercal \mathbf{x} + b).$
+
+\item
+\begin{enumerate}[label=(\roman*)]
+    \item Working under the assumption that $Y \sim Ber(Y\:|\:p)$ (transforming the labels appropriately), we can find the best estimator for $p = P(Y)$ by maximizing
+    \begin{center}$\prod_{i=1}^{n}p^{Y_i}(1 - p)^{1-Y_i}$\end{center}
+    The log-likelihood $L(p)$ is then
+    \begin{center}$\sum_{i=1}^{n}\log(p^{Y_i}(1 - p)^{1-Y_i})$ \end{center}
+    \begin{center}$= \log(p)\sum_{i=1}^{n}Y_i + \log(1 - p)\sum_{i=1}^{n}(1 - Y_i)$ \end{center}
+    \begin{center}$\implies \dfrac{dL}{dp} = \dfrac{\sum_{i=1}^{n}Y_i}{p} - \dfrac{\sum_{i=1}^{n}(1 - Y_i)}{1-p}$ \end{center}
+    \begin{center}$\dfrac{dL}{dp} = 0 \implies \dfrac{\sum_{i=1}^{n}Y_i}{p} = \dfrac{\sum_{i=1}^{n}(1 - Y_i)}{1-p}$\end{center}
+    \begin{center}$\implies \sum_{i=1}^{n}Y_i = p(\sum_{i=1}^{n}(1 - Y_i) + \sum_{i=1}^{n}Y_i) = pn$\end{center}
+    \begin{center}$\implies p = \dfrac{\sum_{i=1}^{n}Y_i}{n}$ \end{center}
+    Interpreting these results to the given problem specifications gives us a best estimator\\
+    \begin{center}$P(Y=c) = \dfrac{\sum_{i=1}^{n}\mathds{1}[Y_i = c]}{n}$\end{center}
+    The best estimator for $P(X_\alpha=j\:|\:Y=c) = \dfrac{\sum_{i=1}^{n}\mathds{1}[Y_i = c]\mathds{1}[X_{i_\alpha} = j]}
+    {\sum_{i=1}^{n}\mathds{1}[Y_i = c]}$\\
+    
+    \item The MLE parameters for $\hat{\mu}_{\alpha c}$ and $\hat{\sigma}_{\alpha c}$ are the following (where $n_c = \sum_{i=1}^{n}\mathds{1}[Y_i = c]):$
+    \begin{center}$\hat{\mu}_{\alpha c} = \dfrac{1}{n_c}\sum_{i=1}^{n}\mathds{1}[Y_i = c]X_{i_\alpha}$\end{center}
+    \begin{center}$\hat{\sigma}_{\alpha c} = \sqrt{\dfrac{1}{n_c}\sum_{i=1}^{n}\mathds{1}[Y_i = c](X_{i_\alpha} - \mu_{\alpha c})^2}$,\end{center}
+    
+    \item There's a model for each feature of $X$ and each label for $Y$, and each model has two parameters. Given that $X$ has $d$ features and $Y$ has two possible labels, the total number of parameters is $4d$.\\
+\end{enumerate}
+
+\item \ \\
+\begin{center}$p(Y = +1\:|\:X) = \dfrac{p(X\:|\:Y=+1)p(Y=+1)}{p(X)}$ \end{center} \ \\
+
+\begin{center}$=\dfrac{p(X\:|\:Y=+1)p(Y=+1)}{p(X\:|\:Y=+1)p(Y=+1) + p(X\:|\:Y=-1)p(Y=-1)}$ \end{center} \ \\
+
+\begin{center}$=\dfrac{\dfrac{p(X\:|\:Y=+1)p(Y=+1)}{p(X\:|\:Y=+1)p(Y=+1)}}
+{\dfrac{p(X\:|\:Y=+1)p(Y=+1)}{p(X\:|\:Y=+1)p(Y=+1)} + \dfrac{p(X\:|\:Y=-1)p(Y=-1)}{p(X\:|\:Y=+1)p(Y=+1)}}$\end{center} \ \\
+
+\begin{center}$=\dfrac{1}{1 + \dfrac{p(X\:|\:Y=-1)p(Y=-1)}{p(X\:|\:Y=+1)p(Y=+1)}}$\end{center} \ \\
+
+\begin{center}$=\dfrac{1}
+{1 + \exp\left(-\log\left(\dfrac{p(Y=+1)}{p(Y=-1)}\dfrac{p(X\:|\:Y=+1)}{p(X\:|\:Y=-1)}\right)\right)}$\end{center} \ \\
+
+\begin{center}$=\dfrac{1}
+{1 + \exp\left(-\log\left(\dfrac{p(Y=+1)}{p(Y=-1)}
+\dfrac{\prod_{\alpha=1}^{d}(\sqrt{\pi\sigma_\alpha^2}\exp\left(-\dfrac{1}{2}\left(\dfrac{X_\alpha-\mu_{\alpha(+1)}}{\sigma_\alpha}\right)^2\right)}
+{\prod_{\alpha=1}^{d}(\sqrt{\pi\sigma_\alpha^2}\exp\left(-\dfrac{1}{2}\left(\dfrac{X_\alpha-\mu_{\alpha(-1)}}{\sigma_\alpha}\right)^2\right)}\right)\right)}$\end{center} \ \\
+
+\begin{center}$=\dfrac{1}
+{1 + \exp\left(-\log\left(\dfrac{p(Y=+1)}{p(Y=-1)}\right) + 
+\sum_{\alpha=1}^{d}\left(\dfrac{1}{2}\left(\dfrac{X_\alpha-\mu_{\alpha(+1)}}{\sigma_\alpha}\right)^2
+- \dfrac{1}{2}\left(\dfrac{X_\alpha-\mu_{\alpha(-1)}}{\sigma_\alpha}\right)^2\right)\right)}$\end{center} \ \\
+
+\begin{center}$=\dfrac{1}
+{1 + \exp\left(-\log\left(\dfrac{p(Y=+1)}{p(Y=-1)}\right) + 
+\sum_{\alpha=1}^{d}\dfrac{\mu_{\alpha(+1)}^2 - \mu_{\alpha(-1)}^2}{2\sigma_\alpha^2}
++ \sum_{\alpha=1}^{d}\dfrac{X_\alpha(\mu_{\alpha(+1)} - \mu_{\alpha(-1)})}{\sigma_\alpha^2}\right)}$\end{center} \ \\
+
+Therefore, $\mathbf{w} = \langle w_i \rangle_{i=0}^{d}$ such that
+\begin{center}$w_0 = \log\dfrac{p(Y = +1)}{p(Y = -1)} + \sum_{\alpha=1}^{d}\dfrac{\mu_{\alpha(+1)}^2 - \mu_{\alpha(-1)}^2}{2\sigma_\alpha^2}$ \end{center}
+\begin{center}$w_\alpha = \dfrac{\mu_{\alpha(+1)} - \mu_{\alpha(-1)}}{\sigma_\alpha^2}$ for $1 \leq \alpha \leq d$\end{center} \ \\
+
+\end{enumerate}
+
+% \section{Comparing two classifiers with cross-validation}
+% \begin{enumerate}[label=(\alph*)]
+
+% \item
+
+% \end{enumerate}
+
+\end{document}
